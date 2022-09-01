@@ -35,7 +35,7 @@ struct Parking {
     
     mutating func checkInVehicle(_ vehicle: Vehicle, onFinish: (Bool) -> Void) {
         //Se verifica si no se pasa la capacidad del parking y si el vehiculo existe, si cualquiera de estas condiciones es falsa se envia un error a la closure
-        guard capacity > self.vehicles.count || self.vehicles.contains(vehicle) else {
+        guard capacity > self.vehicles.count && !self.vehicles.contains(vehicle) else {
             onFinish(false)
             return
         }
@@ -120,33 +120,12 @@ struct Vehicle: Parkable, Hashable {
 
 var alkeParking = Parking()
 
-let vehicle1 = Vehicle(plate: "AA111AA", type:VehicleType.car, discountCard: "DISCOUNT_CARD_001")
-let vehicle2 = Vehicle(plate: "B222BBB", type: VehicleType.motorcycle, discountCard: nil)
-let vehicle3 = Vehicle(plate: "CC333CC", type: VehicleType.miniBus, discountCard: nil)
-let vehicle4 = Vehicle(plate: "DD444DD", type: VehicleType.bus, discountCard: "DISCOUNT_CARD_002")
-let vehicle5 = Vehicle(plate: "AA111BB", type: VehicleType.car, discountCard: "DISCOUNT_CARD_003")
-let vehicle6 = Vehicle(plate: "B222CCC", type: VehicleType.motorcycle, discountCard: "DISCOUNT_CARD_004")
-let vehicle7 = Vehicle(plate: "CC333DD", type: VehicleType.miniBus, discountCard: nil)
-let vehicle8 = Vehicle(plate: "DD444EE", type: VehicleType.bus, discountCard: "DISCOUNT_CARD_005")
-let vehicle9 = Vehicle(plate: "AA111CC", type: VehicleType.car, discountCard: nil)
-let vehicle10 = Vehicle(plate: "B222DDD", type: VehicleType.motorcycle, discountCard: nil)
-let vehicle11 = Vehicle(plate: "CC333EE", type: VehicleType.miniBus, discountCard: nil)
-let vehicle12 = Vehicle(plate: "DD444GG", type: VehicleType.bus, discountCard: "DISCOUNT_CARD_006")
-let vehicle13 = Vehicle(plate: "AA111DD", type: VehicleType.car, discountCard: "DISCOUNT_CARD_007")
-let vehicle14 = Vehicle(plate: "B222EEE", type: VehicleType.motorcycle, discountCard: nil)
-let vehicle15 = Vehicle(plate: "CC333FF", type: VehicleType.miniBus, discountCard: nil)
-let vehicle16 = Vehicle(plate: "AA444HH", type: VehicleType.bus, discountCard: "DISCOUNT_CARD_008")
-let vehicle17 = Vehicle(plate: "AA888PP", type: VehicleType.car, discountCard: "DISCOUNT_CARD_009")
-let vehicle18 = Vehicle(plate: "B555QQQ", type: VehicleType.motorcycle, discountCard: nil)
-let vehicle19 = Vehicle(plate: "CC999XX", type: VehicleType.miniBus, discountCard: nil)
-let vehicle20 = Vehicle(plate: "CC444WW", type: VehicleType.miniBus, discountCard: nil)
-
 let vehicles = [
     Vehicle(plate: "AA111AA", type:VehicleType.car, discountCard: "DISCOUNT_CARD_001"),
     Vehicle(plate: "B222BBB", type: VehicleType.motorcycle, discountCard: nil),
     Vehicle(plate: "DD444DD", type: VehicleType.bus, discountCard: "DISCOUNT_CARD_002"),
     Vehicle(plate: "CC333CC", type: VehicleType.miniBus, discountCard: nil),
-    Vehicle(plate: "DD444DD", type: VehicleType.bus, discountCard: "DISCOUNT_CARD_002"),
+    Vehicle(plate: "DD55DD", type: VehicleType.bus, discountCard: "DISCOUNT_CARD_002"),
     Vehicle(plate: "AA111BB", type: VehicleType.car, discountCard: "DISCOUNT_CARD_003"),
     Vehicle(plate: "B222CCC", type: VehicleType.motorcycle, discountCard: "DISCOUNT_CARD_004"),
     Vehicle(plate: "CC333DD", type: VehicleType.miniBus, discountCard: nil),
@@ -161,11 +140,11 @@ let vehicles = [
     Vehicle(plate: "AA444HH", type: VehicleType.bus, discountCard: "DISCOUNT_CARD_008"),
     Vehicle(plate: "AA888PP", type: VehicleType.car, discountCard: "DISCOUNT_CARD_009"),
     Vehicle(plate: "B555QQQ", type: VehicleType.motorcycle, discountCard: nil),
-    Vehicle(plate: "CC999XX", type: VehicleType.miniBus, discountCard: nil),
-    Vehicle(plate: "CC444WW", type: VehicleType.miniBus, discountCard: nil)
 ]
 
-//Inserto los 20 primeros vehiculos
+//Inserto los 19 primeros vehiculos
+print("************************************")
+print("Ingreso \(vehicles.count) vehiculos:")
 vehicles.forEach { vehicle in
     alkeParking.checkInVehicle(vehicle) { canInsert in
         if !canInsert {
@@ -175,8 +154,37 @@ vehicles.forEach { vehicle in
         }
     }
 }
+print("************************************\n")
+
+//Pruebo ingresar un vehiculo que ya existe
+print("************************************")
+print("Prueba vehiculo patente repetida:")
+let repeatedVehicle = Vehicle(plate: "B555QQQ", type: VehicleType.car, discountCard: nil)
+alkeParking.checkInVehicle(repeatedVehicle) { canInsert in
+    if !canInsert {
+        print("Sorry, the check-in failed")
+    } else {
+        print("Welcome to AlkeParking!")
+    }
+}
+print("************************************\n")
+
+//Ingreso el vehiculo numero 20
+print("************************************")
+print("Ingreso el vehiculo numero 20:")
+let vehicle20 = Vehicle(plate: "CC444WW", type: VehicleType.miniBus, discountCard: nil)
+alkeParking.checkInVehicle(vehicle20) { canInsert in
+    if !canInsert {
+        print("Sorry, the check-in failed")
+    } else {
+        print("Welcome to AlkeParking!")
+    }
+}
+print("************************************\n")
 
 //Pruebo ingresar un vehiculo luego de que ya haya 20 dentro
+print("************************************")
+print("Prueba ingresar unvehiculo con parking lleno:")
 let vehicle21 = Vehicle(plate: "CC444ZZ", type: VehicleType.miniBus, discountCard: nil)
 alkeParking.checkInVehicle(vehicle21) { canInsert in
     if !canInsert {
@@ -185,8 +193,11 @@ alkeParking.checkInVehicle(vehicle21) { canInsert in
         print("Welcome to AlkeParking!")
     }
 }
+print("************************************\n")
 
 //Pruebo hacer el checkout de un vehivulo que existe
+print("************************************")
+print("Prueba checkout de 2 vehiculos existentes:")
 alkeParking.checkOutVehicle(plate: "CC444WW") { fee in
     print("Your fee is $\(fee). Come back soon")
 } onError: {
@@ -203,10 +214,14 @@ alkeParking.checkOutVehicle(plate: "AA888PP") { fee in
 }
 //Muestro las estadisticas del parking
 alkeParking.showStatistics()
+print("************************************\n")
 
 //Pruebo hacer el checkout de un vehivulo que no existe
+print("************************************")
+print("Prueba checkout de vehiculo que no existe:")
 alkeParking.checkOutVehicle(plate: "CC444ZZ") { fee in
     print("Your fee is $\(fee). Come back soon")
 } onError: {
     print("Sorry, the check-out failed")
 }
+print("************************************")
