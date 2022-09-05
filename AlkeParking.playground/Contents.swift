@@ -29,9 +29,9 @@ protocol Parkable {
 
 //Estructura que prepresenta al parking
 struct Parking {
-    var vehicles: Set<Vehicle> = []
+    private (set) var vehicles: Set<Vehicle> = []
     private let capacity: Int = 20
-    var parkingStatistics : (earnings: Int, vehicles: Int) = (0, 0)
+    private (set) var parkingStatistics : (earnings: Int, vehicles: Int) = (0, 0)
     
     mutating func checkInVehicle(_ vehicle: Vehicle, onFinish: (Bool) -> Void) {
         //Se verifica si no se pasa la capacidad del parking y si el vehiculo existe, si cualquiera de estas condiciones es falsa se envia un error a la closure
@@ -43,7 +43,6 @@ struct Parking {
         //Se inserta el vehiculo al parking
         self.vehicles.insert(vehicle)
         onFinish(true)
-        return
     }
     
     mutating func checkOutVehicle(plate: String, onSuccess: (Int) -> Void, onError: () -> Void) {
@@ -65,11 +64,10 @@ struct Parking {
         self.parkingStatistics.earnings += checkoutFee
         self.parkingStatistics.vehicles += 1
         onSuccess(checkoutFee)
-        return
     }
     
     private func calculateFee(type: VehicleType, parkedTime: Int, hasDiscountCard: Bool) -> Int {
-        let hoursInMinutes = 120
+        let twoHoursInMinutes = 120
         var total = 0
         //Si el tiempo de estacionamiento es menor o igual a 2H el cobro es $20.
         //Si el tiempo es de mas de 2H:
@@ -79,7 +77,7 @@ struct Parking {
         if parkedTime <= 120 {
             total = type.rate
         } else {
-            let minutesleft = Float(parkedTime - hoursInMinutes)
+            let minutesleft = Float(parkedTime - twoHoursInMinutes)
             let feeBlocks = ceil((minutesleft/15))
             total = type.rate + Int(feeBlocks) * (type.rate/4)
         }
@@ -224,4 +222,10 @@ alkeParking.checkOutVehicle(plate: "CC444ZZ") { fee in
 } onError: {
     print("Sorry, the check-out failed")
 }
+print("************************************\n")
+
+//Pruebo hacer el checkout de un vehivulo que no existe
+print("************************************")
+print("Listado de patentes:")
+alkeParking.listVehicles()
 print("************************************")
